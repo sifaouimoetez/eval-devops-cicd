@@ -1,0 +1,39 @@
+name: CI - Tests
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Basic checks
+        run: |
+          echo "Checking that index.html exists..."
+          test -f index.html
+          echo "OK: index.html exists"
+
+      - name: Intentional failure (for proof)
+        run: |
+          echo "This step fails on purpose to produce CI failure proof."
+          exit 1
+
+      - name: Write proof artifact (won't run yet)
+        if: always()
+        run: |
+          echo "CI conclusion: ${{ job.status }}" > ci-proof.txt
+          echo "Commit: ${{ github.sha }}" >> ci-proof.txt
+          echo "Run: ${{ github.run_id }}" >> ci-proof.txt
+          echo "Repo: ${{ github.repository }}" >> ci-proof.txt
+          echo "Time: $(date -u)" >> ci-proof.txt
+
+      - name: Upload proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-proof
+          path: ci-proof.txt
