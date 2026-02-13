@@ -17,12 +17,13 @@ jobs:
           test -f index.html
           echo "OK: index.html exists"
 
-      - name: Intentional failure (for proof)
+      - name: Simple content check
         run: |
-          echo "This step fails on purpose to produce CI failure proof."
-          exit 1
+          echo "Checking that index.html contains <h1>TP DevOps</h1>..."
+          grep -q "<h1>TP DevOps</h1>" index.html
+          echo "OK: content looks correct"
 
-      - name: Write proof artifact (won't run yet)
+      - name: Write proof artifact
         if: always()
         run: |
           echo "CI conclusion: ${{ job.status }}" > ci-proof.txt
